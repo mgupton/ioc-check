@@ -40,7 +40,19 @@ param (
 function get_local_admins() {
     $file_name = $OutputPath + "\" + $env:ComputerName + "_local_admins.csv"
 
-    Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
+
+    $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    $osInfo.ProductType
+
+#
+# Handle a domnain controller differently than a non-domain controller
+#
+    if ($osInfo.ProductType -eq 1 -or $osInfo.ProductType -eq 3) {
+        Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
+    }
+    elseif ($osInfo.ProductType -eq 1) {
+        Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
+    }
 }
 
 function get_sched_tasks() {
