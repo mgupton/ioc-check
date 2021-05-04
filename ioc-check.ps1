@@ -1,6 +1,6 @@
 #
 # Author: Michael Gupton
-# Orignal creation date: 2021-5-3
+# Original creation date: 2021-5-3
 #
 
 #
@@ -48,7 +48,27 @@ function get_local_admins() {
         Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
     }
     elseif ($osInfo.ProductType -eq 2) {
-        Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
+        # Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
+
+#
+# Having to workaround this issue, https://github.com/PowerShell/PowerShell/issues/2996
+#
+        $outarray = @()
+
+        foreach ($group in Get-LocalGroup -Name Administrators ) {
+            $group = [ADSI]"WinNT://$env:COMPUTERNAME/$group"
+            $group_members = @($group.Invoke('Members') | % {([adsi]$_).path})
+        }
+
+        foreach ($member in $group_members)
+        {
+            $outarray += New-Object PsObject -property @{
+            'Name' = $member
+            }
+        } 
+
+        $outarray | Export-Csv -Path $file_name
+
     }
 }
 
