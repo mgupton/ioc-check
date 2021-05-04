@@ -47,7 +47,7 @@ function get_local_admins() {
     if ($osInfo.ProductType -eq 1 -or $osInfo.ProductType -eq 3) {
         Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
     }
-    elseif ($osInfo.ProductType -eq 1) {
+    elseif ($osInfo.ProductType -eq 2) {
         Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
     }
 }
