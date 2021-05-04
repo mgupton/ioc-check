@@ -9,6 +9,10 @@
 # This includes admin accounts and scheduled tasks created by a
 # threat actor.
 #
+#
+# The script will list the admin accounts and sceduled tasks
+# and output the results to separate CSV files.
+#
 
 #
 # Example Usage:
@@ -45,11 +49,7 @@ function get_local_admins() {
 # Handle a domain controller differently than a non-domain controller
 #
     if ($osInfo.ProductType -eq 1 -or $osInfo.ProductType -eq 3) {
-        Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
-    }
-    elseif ($osInfo.ProductType -eq 2) {
-        # Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
-
+        # Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
 #
 # Having to workaround this issue, https://github.com/PowerShell/PowerShell/issues/2996
 #
@@ -67,8 +67,10 @@ function get_local_admins() {
             }
         } 
 
-        $outarray | Export-Csv -Path $file_name
-
+        $outarray | Export-Csv -Path $file_name        
+    }
+    elseif ($osInfo.ProductType -eq 2) {
+        Get-ADGroupMember -Identity Administrators | Select-Object -Property Name | Export-Csv -Path $file_name
     }
 }
 
