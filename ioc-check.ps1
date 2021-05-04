@@ -17,6 +17,11 @@
 #
 
 #
+# Option -ExcludeMicrosoft will not include scheduled tasks that have
+# Microsoft as the author.
+#
+
+#
 # This script will produce a file named $ComputerName_local_admins.csv
 # and $ComputerName_sched_tasks.csv at the path specified in -OutputPath.
 #
@@ -27,7 +32,9 @@
 param (
     [Parameter(Mandatory=$true)]
     [String]
-    $OutputPath
+    $OutputPath,
+    [Parameter(Mandatory=$false)]
+    [Switch]$ExcludeMicrosoft
 )
 
 function get_local_admins() {
@@ -39,7 +46,12 @@ function get_local_admins() {
 function get_sched_tasks() {
     $file_name = $OutputPath + "\" + $env:ComputerName + "_sched_tasks.csv"
 
-    Get-ScheduledTask | Select-Object -Property TaskName, Author | Export-Csv -Path $file_name
+    if ($ExcludeMicrosoft -eq $true) {
+        Get-ScheduledTask | where Author -notlike "*microsoft*" | Select-Object -Property TaskName, Author | Export-Csv -Path $file_name
+    }
+    else {
+        Get-ScheduledTask | Select-Object -Property TaskName, Author | Export-Csv -Path $file_name
+    }
 }
 
 get_sched_tasks
