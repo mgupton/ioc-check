@@ -39,13 +39,10 @@ param (
 
 function get_local_admins() {
     $file_name = $OutputPath + "\" + $env:ComputerName + "_local_admins.csv"
-
-
     $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
     $osInfo.ProductType
-
 #
-# Handle a domnain controller differently than a non-domain controller
+# Handle a domain controller differently than a non-domain controller
 #
     if ($osInfo.ProductType -eq 1 -or $osInfo.ProductType -eq 3) {
         Get-LocalGroupMember -Group "Administrators" | Select-Object -Property Name | Export-Csv -Path $file_name
