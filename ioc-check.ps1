@@ -78,7 +78,7 @@ function get_sched_tasks() {
     $file_name = $OutputPath + "\" + $env:ComputerName + "_sched_tasks.csv"
 
     if ($ExcludeMicrosoft -eq $true) {
-        Get-ScheduledTask | where Author -notlike "*microsoft*" | Select-Object -Property TaskName, Author | Export-Csv -Path $file_name
+        Get-ScheduledTask | where Author -notlike "*microsoft*" | Select-Object -Property TaskName, Date, Author | Export-Csv -Path $file_name
     }
     else {
         Get-ScheduledTask | Select-Object -Property TaskName, Author | Export-Csv -Path $file_name
